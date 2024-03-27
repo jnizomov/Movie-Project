@@ -1,0 +1,2 @@
+/Users/javlon_nizomov/Documents/Classes/Project 3 COP3530/build/CMakeFiles/edit_cache.dir
+/Users/javlon_nizomov/Documents/Classes/Project 3 COP3530/build/CMakeFiles/rebuild_cache.dir
