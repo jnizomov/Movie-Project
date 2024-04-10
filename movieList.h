@@ -3,6 +3,7 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 using namespace std;
 struct Movie{
@@ -17,6 +18,7 @@ struct Movie{
 class MovieList{
 private:
     vector<Movie> movies;
+    unordered_map<int, Movie> moviesMap;
 
 public:
     MovieList(string movieFileName, string ratingFileName){
@@ -55,7 +57,7 @@ public:
             while (getline(genreStream, genre, '|')) {
                 movie.genres.push_back(genre);
             }
-            movies.push_back(movie);
+            moviesMap.insert({movie.id, movie});
         }
 
         ifstream file2(ratingFileName);
@@ -72,17 +74,20 @@ public:
             getline(ss, token, ',');
             getline(ss, token, ',');
             int movieid = stoi(token);
-            int i = 0;
+            //int i = 0;
             getline(ss, token, ',');
             float currRating = stof(token);
-            for (auto& movie : movies) {
-                if (movieid == movie.id) {
-                    movie.rating = (movie.rating * movie.numratings + currRating) / (movie.numratings + 1.0);
-                    movie.numratings++;
-                    break;
-                }
-            }
+            Movie temp = moviesMap[movieid];
+            temp.rating = (temp.rating * temp.numratings + currRating) / (temp.numratings + 1.0);
+            temp.numratings++;
+            moviesMap[movieid] = temp;
+            
             getline(ss, token, ',');
+        }
+
+        //Put items from map into vector so items can be sorted
+        for (const auto& pair: moviesMap){
+            movies.push_back(pair.second);
         }
 
     }
