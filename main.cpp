@@ -1,23 +1,25 @@
-// #include <QApplication>
-// #include <QPushButton>
-
 #include "movieList.h"
+#include "CLI11.hpp"
 
+#include <iostream>
+#include <string>
 
-int main(/*int argc, char **argv */)
-{
-//  QApplication app (argc, argv);
+//TODO: Is there a way to parse and load in the movies.csv and ratings.csv before the program is ran (i.e. store it?)
 
-//  QPushButton button ("Hello world !");
-//  button.show();
-
-//  return app.exec();
-
+int main(int argc, char **argv) {
     MovieList list = MovieList("movies.csv", "ratings.csv");
     //prints the first 100 movies
+
+    sortByRating sorter;
+
+    list.quickSortHelper(sorter, false); // true = ascending, false = descending
+
+    /*
+
     for (int i = 0; i < 100; i++)
         list.printMovie(i);
 
+    */
+
     return 0;
 }
-

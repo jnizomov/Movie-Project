@@ -22,7 +22,15 @@ class MovieList{
 
     public:
         MovieList(string movieFileName, string ratingFileName);
+
+        template<typename Compare>
+        void quickSort(vector<Movie>& vec, int left, int right, Compare comp, bool ascending);
+
+        template<typename Compare>
+        void quickSortHelper(Compare comp, bool ascending);
+
         void printMovie(int index);
+        void printMap();
 };
 
 MovieList::MovieList(string movieFileName, string ratingFileName) {
@@ -119,4 +127,92 @@ void MovieList::printMovie(int index) {
     }
 
     cout << "\nRating: " << to_string(movies[index].rating) << endl;
+}
+
+void MovieList::printMap() {
+    // Prints map contents for debugging purposes
+    int n = 10;
+
+    for (int i = 1; i <= n; i++) {
+        const Movie& obj = moviesMap[i];
+
+        std::cout << i << " : {" << obj.title << " with rating " << obj.rating << " | " << obj.numratings << "}" << std::endl;
+    }
+}
+
+// ------------------- //
+// Sorting Algorithms  //
+// ------------------- //
+
+struct sortByRating {
+    bool operator()(const Movie& a, const Movie& b, bool greaterThan) const {
+        return greaterThan ? a.rating > b.rating : a.rating < b.rating;
+    }
+};
+
+struct sortByTitle {
+    bool operator()(const Movie& a, const Movie& b, bool greaterThan) const {
+        return greaterThan ? a.title > b.title : a.title < b.title;
+    }
+};
+
+template<typename Compare>
+int partition(vector<Movie>& vec, int low, int high, Compare comp, bool ascending) {
+    Movie& pivot = vec.at(low); // pivot is lowest element;
+
+    int up = low;
+    int down = high;
+
+    while (up < down) {
+        for (int i = up; i < high; i++) {
+            if (comp(vec.at(up), pivot, ascending)) {
+                break;
+            }
+
+            up++;
+        }
+
+        for (int i = high; i > low; i--) {
+            if (comp(vec.at(down), pivot, !ascending)) {
+                break;
+            }
+
+            down--;
+        }
+
+        if (up < down) {
+            std::swap(vec.at(up), vec.at(down));
+        }
+    }
+
+    std::swap(vec.at(low), vec.at(down));
+
+    return down;
+}
+
+template<typename Compare>
+void MovieList::quickSort(vector<Movie>& vec, int left, int right, Compare comp, bool ascending) {
+    std::cout << "Quick sort called." << std::endl;
+
+    if (left < right) {
+        int pivot = partition(vec, left, right, comp, ascending);
+
+        quickSort(vec, left, pivot - 1, comp, ascending);
+        quickSort(vec, pivot + 1, right, comp, ascending);
+    }
+
+    return;
+}
+
+template<typename Compare>
+void MovieList::quickSortHelper(Compare comp, bool ascending) {
+    std::cout << "Sorting starting." << std::endl;
+
+    quickSort(movies, 0, movies.size() - 1, comp, ascending);
+
+    std::cout << "Sorting ending." << std::endl;
+
+    for (int i = 0; i < 1000; i++) {
+        std::cout << movies[i].title << " : " << movies[i].rating << std::endl;
+    }
 }
