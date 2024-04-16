@@ -20,14 +20,19 @@ class MovieList{
         vector<Movie> movies;
         unordered_map<int, Movie> moviesMap;
 
-        void heapify(vector<Movie>& arr, int n, int i);
-
     public:
         MovieList(string movieFileName, string ratingFileName);
         void printMovie(int index);
-        void heapSort();
         int getNumRatings(int index);
         bool movieExist(int index);
+        void resetList();
+        vector<string> retriveGenre(int index);
+
+        template<typename Compare>
+        void heapSort(Compare comp, bool ascending);
+
+        template<typename Compare>
+        void heapify(vector<Movie>& arr, int n, int i, Compare comp, bool ascending);
 
         template<typename Compare>
         void quickSort(vector<Movie>& vec, int left, int right, Compare comp, bool ascending);
@@ -120,6 +125,7 @@ MovieList::MovieList(string movieFileName, string ratingFileName){
 
 }
 
+
 void MovieList::printMovie(int index){
     cout << "Title: " << movies[index].title << endl;
     cout << "Genre(s): " ;
@@ -143,6 +149,18 @@ bool MovieList::movieExist(int index){
     return true;
 }
 
+void MovieList::resetList(){
+    vector<Movie> temp;
+    for (const auto& pair: moviesMap){
+        temp.push_back(pair.second);
+    }
+    movies = temp;
+}
+
+vector<string> MovieList::retriveGenre(int index){
+    return movies[index].genres;
+}
+
 // ------------------- //
 // Sorting Algorithms  //
 // ------------------- //
@@ -159,38 +177,39 @@ struct sortByTitle {
     }
 };
 
-void MovieList::heapify(vector<Movie>& arr, int n, int i) {
+template<typename Compare>
+void MovieList::heapify(vector<Movie>& arr, int n, int i, Compare comp, bool ascending) {
     int largest = i;
     int left = 2 * i + 1;
     int right = 2 * i + 2;
 
-    if (left < n && arr[left].rating < arr[largest].rating) {
+    if (left < n && comp(arr[left], arr[largest], ascending)) {
         largest = left;
     }
 
-    if (right < n && arr[right].rating < arr[largest].rating) {
+    if (right < n && comp(arr[right], arr[largest], ascending)) {
         largest = right;
     }
 
     if (largest != i) {
         swap(arr[i], arr[largest]);
-        heapify(arr, n, largest);
+        heapify(arr, n, largest, comp, ascending);
     }
 }
 
-
-void MovieList::heapSort() {
+template<typename Compare>
+void MovieList::heapSort(Compare comp, bool ascending) {
     int n = movies.size();
 
     // Build heap (rearrange array)
     for (int i = n / 2 - 1; i >= 0; i--) {
-        heapify(movies, n, i);
+        heapify(movies, n, i, comp, ascending);
     }
 
     // One by one extract an element from heap
     for (int i = n - 1; i > 0; i--) {
         swap(movies[0], movies[i]);
-        heapify(movies, i, 0);
+        heapify(movies, i, 0, comp, ascending);
     }
 }
 
