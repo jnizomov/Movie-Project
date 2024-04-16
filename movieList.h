@@ -28,29 +28,13 @@ class MovieList{
         void heapSort();
         int getNumRatings(int index);
         bool movieExist(int index);
+
+        template<typename Compare>
+        void quickSort(vector<Movie>& vec, int left, int right, Compare comp, bool ascending);
+
+        template<typename Compare>
+        void quickSortHelper(Compare comp, bool ascending);
 };
-
-
-
-void MovieList::heapify(vector<Movie>& arr, int n, int i) {
-    int largest = i;
-    int left = 2 * i + 1;
-    int right = 2 * i + 2;
-
-    if (left < n && arr[left].rating < arr[largest].rating) {
-        largest = left;
-    }
-
-    if (right < n && arr[right].rating < arr[largest].rating) {
-        largest = right;
-    }
-
-    if (largest != i) {
-        swap(arr[i], arr[largest]);
-        heapify(arr, n, largest);
-    }
-}
-
 
 MovieList::MovieList(string movieFileName, string ratingFileName){
     ifstream file(movieFileName);
@@ -136,21 +120,6 @@ MovieList::MovieList(string movieFileName, string ratingFileName){
 
 }
 
-void MovieList::heapSort() {
-    int n = movies.size();
-
-    // Build heap (rearrange array)
-    for (int i = n / 2 - 1; i >= 0; i--) {
-        heapify(movies, n, i);
-    }
-
-    // One by one extract an element from heap
-    for (int i = n - 1; i > 0; i--) {
-        swap(movies[0], movies[i]);
-        heapify(movies, i, 0);
-    }
-}
-
 void MovieList::printMovie(int index){
     cout << "Title: " << movies[index].title << endl;
     cout << "Genre(s): " ;
@@ -172,4 +141,110 @@ bool MovieList::movieExist(int index){
         return false;
     }
     return true;
+}
+
+// ------------------- //
+// Sorting Algorithms  //
+// ------------------- //
+
+struct sortByRating {
+    bool operator()(const Movie& a, const Movie& b, bool greaterThan) const {
+        return greaterThan ? a.rating > b.rating : a.rating < b.rating;
+    }
+};
+
+struct sortByTitle {
+    bool operator()(const Movie& a, const Movie& b, bool greaterThan) const {
+        return greaterThan ? a.title > b.title : a.title < b.title;
+    }
+};
+
+void MovieList::heapify(vector<Movie>& arr, int n, int i) {
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+
+    if (left < n && arr[left].rating < arr[largest].rating) {
+        largest = left;
+    }
+
+    if (right < n && arr[right].rating < arr[largest].rating) {
+        largest = right;
+    }
+
+    if (largest != i) {
+        swap(arr[i], arr[largest]);
+        heapify(arr, n, largest);
+    }
+}
+
+
+void MovieList::heapSort() {
+    int n = movies.size();
+
+    // Build heap (rearrange array)
+    for (int i = n / 2 - 1; i >= 0; i--) {
+        heapify(movies, n, i);
+    }
+
+    // One by one extract an element from heap
+    for (int i = n - 1; i > 0; i--) {
+        swap(movies[0], movies[i]);
+        heapify(movies, i, 0);
+    }
+}
+
+template<typename Compare>
+int partition(vector<Movie>& vec, int low, int high, Compare comp, bool ascending) {
+    Movie& pivot = vec.at(low); // pivot is lowest element;
+
+    int up = low;
+    int down = high;
+
+    while (up < down) {
+        for (int i = up; i < high; i++) {
+            if (comp(vec.at(up), pivot, ascending)) {
+                break;
+            }
+
+            up++;
+        }
+
+        for (int i = high; i > low; i--) {
+            if (comp(vec.at(down), pivot, !ascending)) {
+                break;
+            }
+
+            down--;
+        }
+
+        if (up < down) {
+            std::swap(vec.at(up), vec.at(down));
+        }
+    }
+
+    std::swap(vec.at(low), vec.at(down));
+
+    return down;
+}
+
+template<typename Compare>
+void MovieList::quickSort(vector<Movie>& vec, int left, int right, Compare comp, bool ascending) {
+    if (left < right) {
+        int pivot = partition(vec, left, right, comp, ascending);
+
+        quickSort(vec, left, pivot - 1, comp, ascending);
+        quickSort(vec, pivot + 1, right, comp, ascending);
+    }
+
+    return;
+}
+
+template<typename Compare>
+void MovieList::quickSortHelper(Compare comp, bool ascending) {
+    //std::cout << (ascending ? "Ascending " : "Descending") << " sort starting." << std::endl;
+
+    quickSort(movies, 0, movies.size() - 1, comp, ascending);
+
+    //std::cout << "Sorting ending." << std::endl;
 }

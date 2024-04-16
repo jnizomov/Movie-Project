@@ -14,7 +14,9 @@ int main()
         cout<< "What sorting algorithm would you like to use? (quick, heap, merge)" << endl;
         cin >> sortAlgo;
         if (sortAlgo == "quick"){
-            cout<< "quicksort" << endl; // replace this line with a call to quick sort algo
+            sortByRating sorter; // comparison functor for sort type, change depending on input
+
+            list.quickSortHelper(sorter, true); // true = ascending, false = descending
         } else if (sortAlgo == "heap") {
             list.heapSort();
             //print time taken to complete sorting algo
@@ -42,7 +44,7 @@ int main()
         cout << "Would you like to try a different sorting algorithm? (y for yes, any other character for no)" << endl;
         cin >> keepGoing;
         if (keepGoing == 'y'){
-            list.resetList();
+            //list.resetList();
         } else {
             cont = false;
         }
