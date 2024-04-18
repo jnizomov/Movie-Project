@@ -125,7 +125,6 @@ MovieList::MovieList(string movieFileName, string ratingFileName){
 
 }
 
-
 void MovieList::printMovie(int index){
     cout << "Title: " << movies[index].title << endl;
     cout << "Genre(s): " ;
@@ -143,17 +142,16 @@ int MovieList::getNumRatings(int index){
 }
 
 bool MovieList::movieExist(int index){
-    if (index >= movies.size()){
-        return false;
-    }
-    return true;
+    return (index < movies.size());
 }
 
 void MovieList::resetList(){
     vector<Movie> temp;
+
     for (const auto& pair: moviesMap){
         temp.push_back(pair.second);
     }
+    
     movies = temp;
 }
 
