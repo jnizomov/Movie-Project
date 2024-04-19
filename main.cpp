@@ -96,28 +96,49 @@ int main()
 
         int count = 0;
         int i = 0;
+        int page = 1;
 
-        while (count < 100 && list.movieExist(i)) {
-            if (list.getNumRatings(i) >= minRate) {
-                if (genreExists) {
-                    vector<string> genres = list.retriveGenre(i);
+        bool canPage = true;
 
-                    for (auto item : genres) {
-                        if (item == genre) {
-                            
-                            list.printMovie(i);
-                            count++;
+        while (true) {
+            while (count < (page * 100) && list.movieExist(i)) {
+                if (list.getNumRatings(i) >= minRate) {
+                    if (genreExists) {
+                        vector<string> genres = list.retriveGenre(i);
 
-                            break;
+                        for (auto item : genres) {
+                            if (item == genre) {
+                                
+                                list.printMovie(i);
+                                count++;
+
+                                break;
+                            }
                         }
+                    } else {
+                        list.printMovie(i);
+                        count++;
                     }
-                } else {
-                    list.printMovie(i);
-                    count++;
                 }
+
+                i++;
             }
 
-            i++;
+            if (!list.movieExist(i)) {
+                break;
+            }
+
+            cout << "Would you like to view page " << page + 1 << "?"  << " (y for yes, any other character for no)" << std::endl;
+
+            char keepPaging;
+
+            cin >> keepPaging;
+
+            if (keepPaging == 'y') {
+                page++;
+            } else {
+                break;
+            }
         }
 
         // inform user if there were no results
