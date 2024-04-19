@@ -39,6 +39,18 @@ class MovieList{
 
         template<typename Compare>
         void quickSortHelper(Compare comp, bool ascending);
+
+        template<typename Compare>
+        void mergeSort(vector<Movie>& moviesVec, int left, int right, Compare comp, bool ascending);
+
+        template<typename Compare>
+        void merge(vector<Movie>& moviesVec, int left, int mid, int right, Compare comp, bool ascending);
+
+        template<typename Compare>
+        void mergeSortHelper(Compare comp, bool ascending);
+
+
+
 };
 
 MovieList::MovieList(string movieFileName, string ratingFileName){
@@ -136,7 +148,6 @@ void MovieList::printMovie(int index){
     cout << "Number of Ratings: " << to_string(movies[index].numratings) << endl;
     cout << endl;
 }
-
 int MovieList::getNumRatings(int index){
     return movies[index].numratings;
 }
@@ -265,3 +276,76 @@ void MovieList::quickSortHelper(Compare comp, bool ascending) {
 
     //std::cout << "Sorting ending." << std::endl;
 }
+
+
+template<typename Compare>
+void MovieList::mergeSort(vector<Movie>& moviesVec, int left, int right, Compare comp, bool ascending){
+    if(left < right){
+
+        //mid divides vector into 2
+        int mid = left + (right - left) / 2;
+
+        //recurisvely divide left side into half until its 1 unit
+        mergeSort(moviesVec,left,mid,comp,ascending);
+        mergeSort(moviesVec,mid+1,right,comp,ascending);
+
+        //merge sorted subarrays
+        merge(moviesVec,left,mid,right,comp,ascending);
+    }
+}
+
+template<typename Compare>
+void MovieList::merge(vector<Movie>& moviesVec, int left, int mid, int right,Compare comp, bool ascending){
+
+    //size of left and right
+    int n1 = mid - left +1;
+    int n2 = right - mid;
+
+    //init left and right temp movies
+    Movie* X = new Movie[n1];
+    Movie* Y = new Movie[n2];
+
+    //fill temps with information
+    for (int i = 0; i < n1; i++)
+        X[i] = moviesVec[left + i];
+    for (int j = 0; j < n2; j++)
+        Y[j] = moviesVec[mid + 1 + j];
+
+    //merging temp arrays into moviesVec
+    int i = 0;
+    int j = 0;
+    int k = left;
+    while(i < n1 && j <n2) {
+        if (comp(X[i], Y[j], ascending)) {
+            moviesVec[k] = X[i];
+            i++;
+        } else {
+            moviesVec[k] = Y[i];
+            j++;
+        }
+        k++;
+    }
+
+    //once out of elements in one, just add the rest from the other
+    while(i < n1){
+        moviesVec[k] = X[i];
+        i++;
+        k++;
+    }
+    while(j < n2){
+        moviesVec[k] = Y[j];
+        j++;
+        k++;
+    }
+
+    delete[] X;
+    delete[] Y;
+}
+
+template<typename Compare>
+void MovieList::mergeSortHelper(Compare comp, bool ascending){
+
+    mergeSort(movies, 0, movies.size() -1, comp, ascending);
+
+}
+

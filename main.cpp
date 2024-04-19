@@ -58,9 +58,17 @@ int main()
                 list.heapSort(sorterTitle, ascending);
             }
         } else if (sortAlgo == 'm') {
-            sortName = "mergesort";
 
             // Call merge sort algorithm here
+            sortName = "mergesort";
+
+            if(sortedBy == 'r'){
+                list.mergeSortHelper(sorterRating, ascending);
+            }
+            else{
+                list.mergeSortHelper(sorterTitle,ascending);
+            }
+
         } else {
             cout << "Invalid Input" << endl;
             continue;
@@ -137,3 +145,4 @@ int main()
     }
     return 0;
 }
+
