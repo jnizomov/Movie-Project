@@ -320,7 +320,7 @@ void MovieList::merge(vector<Movie>& moviesVec, int left, int mid, int right,Com
             moviesVec[k] = X[i];
             i++;
         } else {
-            moviesVec[k] = Y[i];
+            moviesVec[k] = Y[j];
             j++;
         }
         k++;
