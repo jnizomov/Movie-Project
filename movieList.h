@@ -315,6 +315,7 @@ void MovieList::merge(vector<Movie>& moviesVec, int left, int mid, int right,Com
     int i = 0;
     int j = 0;
     int k = left;
+
     while(i < n1 && j <n2) {
         if (comp(X[i], Y[j], ascending)) {
             moviesVec[k] = X[i];
@@ -344,8 +345,6 @@ void MovieList::merge(vector<Movie>& moviesVec, int left, int mid, int right,Com
 
 template<typename Compare>
 void MovieList::mergeSortHelper(Compare comp, bool ascending){
-
-    mergeSort(movies, 0, movies.size() -1, comp, ascending);
-
+    mergeSort(movies, 0, movies.size() -1, comp, !ascending);
 }
 
