@@ -16,38 +16,38 @@ struct Movie{
 };
 
 class MovieList{
-    private:
-        vector<Movie> movies;
-        unordered_map<int, Movie> moviesMap;
+private:
+    vector<Movie> movies;
+    unordered_map<int, Movie> moviesMap;
 
-    public:
-        MovieList(string movieFileName, string ratingFileName);
-        void printMovie(int index);
-        int getNumRatings(int index);
-        bool movieExist(int index);
-        void resetList();
-        vector<string> retriveGenre(int index);
+public:
+    MovieList(string movieFileName, string ratingFileName);
+    void printMovie(int index);
+    int getNumRatings(int index);
+    bool movieExist(int index);
+    void resetList();
+    vector<string> retriveGenre(int index);
 
-        template<typename Compare>
-        void heapSort(Compare comp, bool ascending);
+    template<typename Compare>
+    void heapSort(Compare comp, bool ascending);
 
-        template<typename Compare>
-        void heapify(vector<Movie>& arr, int n, int i, Compare comp, bool ascending);
+    template<typename Compare>
+    void heapify(vector<Movie>& arr, int n, int i, Compare comp, bool ascending);
 
-        template<typename Compare>
-        void quickSort(vector<Movie>& vec, int left, int right, Compare comp, bool ascending);
+    template<typename Compare>
+    void quickSort(vector<Movie>& vec, int left, int right, Compare comp, bool ascending);
 
-        template<typename Compare>
-        void quickSortHelper(Compare comp, bool ascending);
+    template<typename Compare>
+    void quickSortHelper(Compare comp, bool ascending);
 
-        template<typename Compare>
-        void mergeSort(vector<Movie>& moviesVec, int left, int right, Compare comp, bool ascending);
+    template<typename Compare>
+    void mergeSort(vector<Movie>& moviesVec, int left, int right, Compare comp, bool ascending);
 
-        template<typename Compare>
-        void merge(vector<Movie>& moviesVec, int left, int mid, int right, Compare comp, bool ascending);
+    template<typename Compare>
+    void merge(vector<Movie>& moviesVec, int left, int mid, int right, Compare comp, bool ascending);
 
-        template<typename Compare>
-        void mergeSortHelper(Compare comp, bool ascending);
+    template<typename Compare>
+    void mergeSortHelper(Compare comp, bool ascending);
 
 
 
@@ -136,12 +136,14 @@ MovieList::MovieList(string movieFileName, string ratingFileName){
     }
 
 }
-
 void MovieList::printMovie(int index){
     cout << "Title: " << movies[index].title << endl;
-    cout << "Genre(s): " ;
-    for (string genre : movies[index].genres){
-        cout << genre << ' ';
+
+    if (!movies[index].genres.empty()) {
+        cout << "Genre(s): " << movies[index].genres.front();
+        for (size_t i = 1; i < movies[index].genres.size(); ++i) {
+            cout << ", " << movies[index].genres[i];
+        }
     }
 
     cout << "\nRating: " << to_string(movies[index].rating) << endl;
@@ -162,7 +164,7 @@ void MovieList::resetList(){
     for (const auto& pair: moviesMap){
         temp.push_back(pair.second);
     }
-    
+
     movies = temp;
 }
 

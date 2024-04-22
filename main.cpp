@@ -1,15 +1,28 @@
 #include "movieList.h"
 #include <chrono> // Include chrono library for timing
 
+
+void getAlgoSortOrder(char& sortAlgo, char& sortedBy, char& order) {
+    cout<< "What sorting algorithm would you like to use? (q for quick, h for heap, m for merge)" << endl;
+    cin >> sortAlgo;
+    cout << "What would you like the movies to be sorted by? (t for title or r for rating)" << endl;
+    cin >> sortedBy;
+    cout << "Sorted by descending or ascending order? (a for ascending or d for descending)" << endl;
+    cin >> order;
+}
+
+void getMinRatingsGenre(int& minRate, string& genre){
+    cout << "What are the minimum number of user-submitted ratings you would like for the movies displayed to have? (1-100000)" << endl;
+    cin >> minRate;
+    cout << "What genre would you like to like to be listed? (Action, Adventure, Animation, Children, Comedy, Crime, Documentary, Drama, Fantasy, Film-Noir, Horror, Romance, Sci-Fi, Thriller, War, Western, or any other text for all genres)" << endl;
+    cin >> genre;
+}
+
 int main()
 {
     MovieList list = MovieList("movies.csv", "ratings.csv");
 
     bool cont = true;
-    char sortAlgo;
-    char sortedBy;
-    char order;
-    bool ascending;
 
     string sep = "__________________________________________________";
 
@@ -21,27 +34,31 @@ int main()
     cout << sep << endl << endl;
 
     while (cont) {
-        cout<< "What sorting algorithm would you like to use? (q for quick, h for heap, m for merge)" << endl;
-        cin >> sortAlgo;
-        cout << "What would you like the movies to be sorted by? (t for title or r for rating)" << endl;
-        cin >> sortedBy;
-        cout << "Sorted by descending or ascending order? (a for ascending or d for descending)" << endl;
-        cin >> order;
 
+        //Get user inputs on what type of sorting, sort order, and ascending/descending
+        char sortAlgo;
+        char sortedBy;
+        char order;
+        getAlgoSortOrder(sortAlgo,sortedBy,order);
+
+
+        bool ascending;
         if (order == 'a'){
             ascending = true;
         } else {
             ascending = false;
         }
 
+
         sortByRating sorterRating;
         sortByTitle sorterTitle;
-
         string sortName;
 
+        //start clock to measure efficiency of sort, call sort on the list of movies
         auto start = chrono::steady_clock::now();
 
         if (sortAlgo == 'q'){
+            //call quicksort
             sortName = "quicksort";
 
             if (sortedBy == 'r'){
@@ -49,17 +66,19 @@ int main()
             } else {
                 list.quickSortHelper(sorterTitle, ascending);
             }
+
         } else if (sortAlgo == 'h') {
+            //call heapsort
             sortName = "heapsort";
-            
+
             if (sortedBy == 'r'){
                 list.heapSort(sorterRating, ascending);
             } else {
                 list.heapSort(sorterTitle, ascending);
             }
-        } else if (sortAlgo == 'm') {
 
-            // Call merge sort algorithm here
+        } else if (sortAlgo == 'm') {
+            //call mergesort
             sortName = "mergesort";
 
             if(sortedBy == 'r'){
@@ -77,17 +96,14 @@ int main()
         auto end = chrono::steady_clock::now();
 
         //prints the top 100 highest reviewed films with a minimum number of ratings for the user input.
-        
+
+        //retrieves user input on min # of ratings and genre
         int minRate;
         string genre;
-        
-        cout << "What are the minimum number of user-submitted ratings you would like for the movies displayed to have? (1-100000)" << endl;
-        cin >> minRate;
-        cout << "What genre would you like to like to be listed? (Action, Adventure, Animation, Children, Comedy, Crime, Documentary, Drama, Fantasy, Film-Noir, Horror, Romance, Sci-Fi, Thriller, War, Western, or any other text for all genres)" << endl;
-        cin >> genre;
+        getMinRatingsGenre(minRate,genre);
 
         bool genreExists = false;
-        
+
         if (genre == "Action" || genre == "Adventure" || genre == "Animation" || genre == "Children" || genre == "Comedy" || genre == "Crime" || genre == "Documentary" || genre == "Drama" || genre == "Fantasy" || genre == "Film-Noir" || genre == "Horror" || genre == "Romance" || genre == "Sci-Fi" || genre == "Thriller"|| genre == "War" || genre == "Western"){
             genreExists = true;
         }
@@ -98,7 +114,6 @@ int main()
         int i = 0;
         int page = 1;
 
-        bool canPage = true;
 
         while (true) {
             while (count < (page * 100) && list.movieExist(i)) {
@@ -108,7 +123,7 @@ int main()
 
                         for (auto item : genres) {
                             if (item == genre) {
-                                
+
                                 list.printMovie(i);
                                 count++;
 
@@ -166,4 +181,3 @@ int main()
     }
     return 0;
 }
-
