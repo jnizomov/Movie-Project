@@ -1,7 +1,4 @@
-#include "movieList.h"
-#include <chrono> // Include chrono library for timing
-
-
+// Function to get user inputs for sorting algorithm, sorted by, and order
 void getAlgoSortOrder(char& sortAlgo, char& sortedBy, char& order) {
     cout<< "What sorting algorithm would you like to use? (q for quick, h for heap, m for merge)" << endl;
     cin >> sortAlgo;
@@ -11,6 +8,7 @@ void getAlgoSortOrder(char& sortAlgo, char& sortedBy, char& order) {
     cin >> order;
 }
 
+// Function to get minimum ratings and genre from user
 void getMinRatingsGenre(int& minRate, string& genre){
     cout << "What are the minimum number of user-submitted ratings you would like for the movies displayed to have? (1-100000)" << endl;
     cin >> minRate;
@@ -20,12 +18,14 @@ void getMinRatingsGenre(int& minRate, string& genre){
 
 int main()
 {
+    // Initialize MovieList object with movie and rating files
     MovieList list = MovieList("movies.csv", "ratings.csv");
 
     bool cont = true;
 
     string sep = "__________________________________________________";
 
+    // Display welcome message
     cout << sep << endl;
     cout << "\n          Welcome to Movie Sorter!" << endl << endl;
     cout << "This program allows users to sort movies based on" << endl;
@@ -35,13 +35,13 @@ int main()
 
     while (cont) {
 
-        //Get user inputs on what type of sorting, sort order, and ascending/descending
+        // Get user inputs on sorting algorithm, sort order, and ascending/descending
         char sortAlgo;
         char sortedBy;
         char order;
         getAlgoSortOrder(sortAlgo,sortedBy,order);
 
-
+        // Determine if sorting should be in ascending order
         bool ascending;
         if (order == 'a'){
             ascending = true;
@@ -49,18 +49,16 @@ int main()
             ascending = false;
         }
 
-
         sortByRating sorterRating;
         sortByTitle sorterTitle;
         string sortName;
 
-        //start clock to measure efficiency of sort, call sort on the list of movies
+        // Start clock to measure efficiency of sort, call sort on the list of movies
         auto start = chrono::steady_clock::now();
 
         if (sortAlgo == 'q'){
-            //call quicksort
+            // Call quicksort
             sortName = "quicksort";
-
             if (sortedBy == 'r'){
                 list.quickSortHelper(sorterRating, ascending);
             } else {
@@ -68,9 +66,8 @@ int main()
             }
 
         } else if (sortAlgo == 'h') {
-            //call heapsort
+            // Call heapsort
             sortName = "heapsort";
-
             if (sortedBy == 'r'){
                 list.heapSort(sorterRating, ascending);
             } else {
@@ -78,13 +75,11 @@ int main()
             }
 
         } else if (sortAlgo == 'm') {
-            //call mergesort
+            // Call mergesort
             sortName = "mergesort";
-
             if(sortedBy == 'r'){
                 list.mergeSortHelper(sorterRating, ascending);
-            }
-            else{
+            } else {
                 list.mergeSortHelper(sorterTitle,ascending);
             }
 
@@ -95,15 +90,16 @@ int main()
 
         auto end = chrono::steady_clock::now();
 
-        //prints the top 100 highest reviewed films with a minimum number of ratings for the user input.
+        // Print the top 100 highest reviewed films with a minimum number of ratings for the user input.
 
-        //retrieves user input on min # of ratings and genre
+        // Retrieve user input on minimum number of ratings and genre
         int minRate;
         string genre;
         getMinRatingsGenre(minRate,genre);
 
         bool genreExists = false;
 
+        // Check if the provided genre exists
         if (genre == "Action" || genre == "Adventure" || genre == "Animation" || genre == "Children" || genre == "Comedy" || genre == "Crime" || genre == "Documentary" || genre == "Drama" || genre == "Fantasy" || genre == "Film-Noir" || genre == "Horror" || genre == "Romance" || genre == "Sci-Fi" || genre == "Thriller"|| genre == "War" || genre == "Western"){
             genreExists = true;
         }
@@ -114,7 +110,7 @@ int main()
         int i = 0;
         int page = 1;
 
-
+        // Iterate through movies and display them with given constraints
         while (true) {
             while (count < (page * 100) && list.movieExist(i)) {
                 if (list.getNumRatings(i) >= minRate) {
@@ -123,10 +119,8 @@ int main()
 
                         for (auto item : genres) {
                             if (item == genre) {
-
                                 list.printMovie(i);
                                 count++;
-
                                 break;
                             }
                         }
@@ -146,7 +140,6 @@ int main()
             cout << "Would you like to view page " << page + 1 << "?"  << " (y for yes, any other character for no)" << std::endl;
 
             char keepPaging;
-
             cin >> keepPaging;
 
             if (keepPaging == 'y') {
@@ -156,18 +149,16 @@ int main()
             }
         }
 
-        // inform user if there were no results
-
+        // Inform user if there were no results
         if (count == 0) {
             cout << "No movies found. Please try again." << endl << endl;
         } else {
             // Output time taken to run the algorithm at the end;
-
             cout << "Time taken for " << sortName << ": " << chrono::duration_cast<chrono::nanoseconds>(end - start).count() << " nanoseconds" << endl;
-
             cout << sep << endl << endl;
         }
 
+        // Ask user if they want to try a different sorting algorithm
         char keepGoing;
         cout << "Would you like to try a different sorting algorithm? (y for yes, any other character for no)" << endl;
         cin >> keepGoing;
@@ -179,5 +170,6 @@ int main()
             cont = false;
         }
     }
+    
     return 0;
 }
