@@ -1,3 +1,6 @@
+#include "movieList.h"
+#include <chrono> // Include chrono library for timing
+
 // Function to get user inputs for sorting algorithm, sorted by, and order
 void getAlgoSortOrder(char& sortAlgo, char& sortedBy, char& order) {
     cout<< "What sorting algorithm would you like to use? (q for quick, h for heap, m for merge)" << endl;
