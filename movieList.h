@@ -6,169 +6,194 @@
 #include <unordered_map>
 
 using namespace std;
-struct Movie{
+
+// Structure to represent a Movie
+struct Movie {
     int id;
     string title;
     vector<string> genres;
-    float rating = 0.0;
-    int numratings = 0;
-
+    float rating = 0.0; // Average rating of the movie
+    int numratings = 0; // Number of ratings received for the movie
 };
 
-class MovieList{
+// Class to manage a list of movies
+class MovieList {
 private:
-    vector<Movie> movies;
-    unordered_map<int, Movie> moviesMap;
+    vector<Movie> movies; // Vector to store movies
+    unordered_map<int, Movie> moviesMap; // Map to quickly access movies by id
 
 public:
+    // Constructor to initialize MovieList from files
     MovieList(string movieFileName, string ratingFileName);
+
+    // Method to print details of a movie
     void printMovie(int index);
+
+    // Method to get the number of ratings for a movie
     int getNumRatings(int index);
+
+    // Method to check if a movie exists at given index
     bool movieExist(int index);
+
+    // Method to reset the movie list
     void resetList();
+
+    // Method to retrieve genres of a movie
     vector<string> retriveGenre(int index);
 
+    // Sorting algorithms
+
+    // Heap sort
     template<typename Compare>
     void heapSort(Compare comp, bool ascending);
 
+    // Helper function for heap sort
     template<typename Compare>
     void heapify(vector<Movie>& arr, int n, int i, Compare comp, bool ascending);
 
+    // Quick sort
     template<typename Compare>
     void quickSort(vector<Movie>& vec, int left, int right, Compare comp, bool ascending);
 
+    // Helper function for quick sort
     template<typename Compare>
     void quickSortHelper(Compare comp, bool ascending);
 
+    // Merge sort
     template<typename Compare>
     void mergeSort(vector<Movie>& moviesVec, int left, int right, Compare comp, bool ascending);
 
+    // Helper function for merge sort
     template<typename Compare>
     void merge(vector<Movie>& moviesVec, int left, int mid, int right, Compare comp, bool ascending);
 
+    // Helper function for merge sort
     template<typename Compare>
     void mergeSortHelper(Compare comp, bool ascending);
-
-
-
 };
 
-MovieList::MovieList(string movieFileName, string ratingFileName){
+// Constructor implementation
+MovieList::MovieList(string movieFileName, string ratingFileName) {
+    // Read movie file
     ifstream file(movieFileName);
     if (!file.is_open()) {
         cout << "Error: Unable to open movie file " << movieFileName << endl;
     }
     string line;
-    getline(file,line);
+    getline(file, line);
 
-    while (getline(file, line)){
+    // Parse movie file and populate movies and moviesMap
+    while (getline(file, line)) {
         Movie movie;
-
         stringstream ss(line);
         string token;
 
+        // Parse movie details from line
+        // Extract movie id
         getline(ss, token, ',');
         movie.id = stoi(token);
 
+        // Extract movie title
         getline(ss, token, ',');
-
         if (token.front() == '"') {
+            // Handle title with commas
             size_t startPos = line.find_first_of('"');
             size_t endPos = line.find_last_of('"');
-
             movie.title = line.substr(startPos + 1, endPos - startPos - 1);
-
             for (char ch : movie.title) {
                 if (ch == ',') {
                     getline(ss, token, ',');
                 }
             }
-
         } else {
             movie.title = token;
         }
 
+        // Extract movie genres
         getline(ss, token, ',');
         stringstream genreStream(token);
         string genre;
-
         while (getline(genreStream, genre, '|')) {
             movie.genres.push_back(genre);
         }
 
+        // Insert movie into moviesMap
         moviesMap.insert({movie.id, movie});
     }
 
+    // Read rating file
     ifstream file2(ratingFileName);
-
     if (!file2.is_open()) {
         cout << "Error: Unable to open movie file " << ratingFileName << endl;
     }
-
     string line2;
     getline(file2, line2);
 
-    while(getline(file2, line2)) {
+    // Parse rating file and update movie ratings
+    while (getline(file2, line2)) {
         stringstream ss(line2);
         string token;
 
+        // Extract movie id
         getline(ss, token, ',');
         getline(ss, token, ',');
-
         int movieid = stoi(token);
 
+        // Extract rating
         getline(ss, token, ',');
-
         float currRating = stof(token);
-        Movie temp = moviesMap[movieid];
 
+        // Update movie rating and number of ratings
+        Movie temp = moviesMap[movieid];
         temp.rating = (temp.rating * temp.numratings + currRating) / (temp.numratings + 1.0);
         temp.numratings++;
-
         moviesMap[movieid] = temp;
 
         getline(ss, token, ',');
     }
 
-    //Put items from map into vector so items can be sorted
-    for (const auto& pair: moviesMap){
+    // Put items from map into vector for sorting
+    for (const auto& pair: moviesMap) {
         movies.push_back(pair.second);
     }
-
 }
-void MovieList::printMovie(int index){
-    cout << "Title: " << movies[index].title << endl;
 
+// Method to print details of a movie
+void MovieList::printMovie(int index) {
+    cout << "Title: " << movies[index].title << endl;
     if (!movies[index].genres.empty()) {
         cout << "Genre(s): " << movies[index].genres.front();
         for (size_t i = 1; i < movies[index].genres.size(); ++i) {
             cout << ", " << movies[index].genres[i];
         }
     }
-
+    
     cout << "\nRating: " << to_string(movies[index].rating) << endl;
     cout << "Number of Ratings: " << to_string(movies[index].numratings) << endl;
     cout << endl;
 }
-int MovieList::getNumRatings(int index){
+
+// Method to get the number of ratings for a movie
+int MovieList::getNumRatings(int index) {
     return movies[index].numratings;
 }
 
-bool MovieList::movieExist(int index){
+// Method to check if a movie exists at given index
+bool MovieList::movieExist(int index) {
     return (index < movies.size());
 }
 
-void MovieList::resetList(){
+// Method to reset the movie list
+void MovieList::resetList() {
     vector<Movie> temp;
-
-    for (const auto& pair: moviesMap){
+    for (const auto& pair: moviesMap) {
         temp.push_back(pair.second);
     }
-
     movies = temp;
 }
 
-vector<string> MovieList::retriveGenre(int index){
+// Method to retrieve genres of a movie
+vector<string> MovieList::retriveGenre(int index) {
     return movies[index].genres;
 }
 
@@ -176,12 +201,14 @@ vector<string> MovieList::retriveGenre(int index){
 // Sorting Algorithms  //
 // ------------------- //
 
+// Comparator for sorting by rating
 struct sortByRating {
     bool operator()(const Movie& a, const Movie& b, bool greaterThan) const {
         return greaterThan ? a.rating > b.rating : a.rating < b.rating;
     }
 };
 
+// Comparator for sorting by title
 struct sortByTitle {
     bool operator()(const Movie& a, const Movie& b, bool greaterThan) const {
         return greaterThan ? a.title > b.title : a.title < b.title;
